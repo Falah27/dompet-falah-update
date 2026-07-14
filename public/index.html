@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Bento</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar">
+    <h1>🍱 Bento</h1>
+    <button class="nav-btn active" data-page="dashboard">🏠 Dashboard</button>
+    <button class="nav-btn" data-page="dompet">👛 Dompet</button>
+    <button class="nav-btn" data-page="data">📁 Data Lengkap</button>
+  </nav>
+
+  <main class="content">
+    <section id="page-dashboard" class="page active">
+      <h2>Dashboard</h2>
+      <div class="cards" id="summary-cards"></div>
+
+      <div class="form-box">
+        <h3>📝 Input Transaksi</h3>
+        <form id="form-transaksi">
+          <input type="date" id="in-tanggal" required>
+          <select id="in-tipe">
+            <option value="Pengeluaran">Pengeluaran</option>
+            <option value="Pemasukan">Pemasukan</option>
+          </select>
+          <select id="in-kategori"></select>
+          <input type="text" id="in-item" placeholder="Item" required>
+          <input type="number" id="in-nominal" placeholder="Nominal" required>
+          <select id="in-metode"></select>
+          <input type="text" id="in-keterangan" placeholder="Keterangan (opsional)">
+          <button type="submit">💾 Simpan</button>
+        </form>
+      </div>
+
+      <div class="charts">
+        <canvas id="chart-kategori"></canvas>
+      </div>
+
+      <div class="budget-box" id="budget-progress"></div>
+      <div class="target-box" id="target-progress"></div>
+    </section>
+
+    <section id="page-dompet" class="page">
+      <h2>Dompet Saya</h2>
+      <div class="wallet-cards" id="wallet-cards"></div>
+    </section>
+
+    <section id="page-data" class="page">
+      <h2>Data Lengkap</h2>
+      <input type="text" id="search-box" placeholder="Cari item...">
+      <table id="data-table"><thead></thead><tbody></tbody></table>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
