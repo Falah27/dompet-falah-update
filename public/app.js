@@ -20,6 +20,7 @@ async function loadData() {
   renderDashboard();
   renderWallets();
   renderTable(state.transaksi);
+  fillTransferSelects();
 }
 
 function renderDashboard() {
@@ -79,6 +80,76 @@ function renderTable(rows) {
     <td>Rp ${Number(r.Nominal).toLocaleString('id-ID')}</td><td>${r.Tipe}</td><td>${r.Status}</td></tr>
   `).join('');
 }
+
+// --- Transfer Internal ---
+function fillTransferSelects() {
+  const wallets = state.dompet.map(w => w.Wallet);
+  if (!wallets.includes('Cash')) wallets.push('Cash');
+  const src = document.getElementById('tf-source');
+  const tgt = document.getElementById('tf-target');
+  src.innerHTML = wallets.map(w => `<option>${w}</option>`).join('');
+  tgt.innerHTML = wallets.filter(w => w !== src.value).map(w => `<option>${w}</option>`).join('');
+  src.onchange = () => {
+    tgt.innerHTML = wallets.filter(w => w !== src.value).map(w => `<option>${w}</option>`).join('');
+  };
+}
+
+document.getElementById('form-transfer').onsubmit = async (e) => {
+  e.preventDefault();
+  const payload = {
+    tanggal: document.getElementById('tf-tanggal').value,
+    nominal: document.getElementById('tf-nominal').value,
+    source: document.getElementById('tf-source').value,
+    target: document.getElementById('tf-target').value,
+    note: document.getElementById('tf-note').value,
+  };
+  if (payload.source === payload.target) return alert('Sumber dan tujuan tidak boleh sama');
+  const result = await apiCall('/api/transfer', { method: 'POST', body: JSON.stringify(payload) });
+  if (result.success) { alert('Transfer berhasil!'); e.target.reset(); loadData(); }
+  else alert(result.error);
+};
+
+// --- Kelola Utang ---
+function renderUtang() {
+  const utang = state.transaksi.filter(t => t.Status === 'Belum Lunas');
+  const list = document.getElementById('utang-list');
+  if (utang.length === 0) {
+    list.innerHTML = '<p class="hint">✅ Tidak ada tanggungan saat ini.</p>';
+    return;
+  }
+  list.innerHTML = utang.map(t => `
+    <div class="utang-item" data-row="${t.rowNumber}">
+      <div class="info"><b>${t.Item}</b>${t.Kategori} · Rp ${Number(t.Nominal).toLocaleString('id-ID')}</div>
+      <select class="utang-status"><option value="Belum Lunas">Belum Lunas</option><option value="Lunas">Lunas</option></select>
+      <select class="utang-metode">${METODE.map(m => `<option>${m}</option>`).join('')}</select>
+      <button class="utang-save">Simpan</button>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.utang-save').forEach(btn => {
+    btn.onclick = async () => {
+      const item = btn.closest('.utang-item');
+      const rowNumber = item.dataset.row;
+      const status = item.querySelector('.utang-status').value;
+      const metode = item.querySelector('.utang-metode').value;
+      const result = await apiCall('/api/update-transaction-status', {
+        method: 'POST', body: JSON.stringify({ rowNumber, status, metode }),
+      });
+      if (result.success) { alert('Berhasil diperbarui!'); loadData(); }
+      else alert(result.error);
+    };
+  });
+}
+
+// --- Tabs di halaman Data ---
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    if (btn.dataset.tab === 'utang') renderUtang();
+  };
+});
 
 // Nav
 document.querySelectorAll('.nav-btn').forEach(btn => {

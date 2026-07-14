@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Budget Bento</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -10,10 +10,10 @@
 <body>
 <div class="app">
   <nav class="sidebar">
-    <h1>🍱 Bento</h1>
-    <button class="nav-btn active" data-page="dashboard">🏠 Dashboard</button>
-    <button class="nav-btn" data-page="dompet">👛 Dompet</button>
-    <button class="nav-btn" data-page="data">📁 Data Lengkap</button>
+    <h1 class="logo">🍱 Bento</h1>
+    <button class="nav-btn active" data-page="dashboard"><span>🏠</span><small>Dashboard</small></button>
+    <button class="nav-btn" data-page="dompet"><span>👛</span><small>Dompet</small></button>
+    <button class="nav-btn" data-page="data"><span>📁</span><small>Data</small></button>
   </nav>
 
   <main class="content">
@@ -21,8 +21,8 @@
       <h2>Dashboard</h2>
       <div class="cards" id="summary-cards"></div>
 
-      <div class="form-box">
-        <h3>📝 Input Transaksi</h3>
+      <details class="form-box" open>
+        <summary>📝 Input Transaksi</summary>
         <form id="form-transaksi">
           <input type="date" id="in-tanggal" required>
           <select id="in-tipe">
@@ -32,11 +32,27 @@
           <select id="in-kategori"></select>
           <input type="text" id="in-item" placeholder="Item" required>
           <input type="number" id="in-nominal" placeholder="Nominal" required>
+          <select id="in-status">
+            <option value="Lunas">Lunas</option>
+            <option value="Belum Lunas">Belum Lunas</option>
+          </select>
           <select id="in-metode"></select>
           <input type="text" id="in-keterangan" placeholder="Keterangan (opsional)">
-          <button type="submit">💾 Simpan</button>
+          <button type="submit">💾 Simpan Transaksi</button>
         </form>
-      </div>
+      </details>
+
+      <details class="form-box">
+        <summary>🔄 Transfer Internal & Tarik Tunai</summary>
+        <form id="form-transfer">
+          <input type="date" id="tf-tanggal" required>
+          <select id="tf-source"></select>
+          <select id="tf-target"></select>
+          <input type="number" id="tf-nominal" placeholder="Nominal" required>
+          <input type="text" id="tf-note" placeholder="Catatan">
+          <button type="submit">✅ Proses Transfer</button>
+        </form>
+      </details>
 
       <div class="charts">
         <canvas id="chart-kategori"></canvas>
@@ -53,8 +69,24 @@
 
     <section id="page-data" class="page">
       <h2>Data Lengkap</h2>
-      <input type="text" id="search-box" placeholder="Cari item...">
-      <table id="data-table"><thead></thead><tbody></tbody></table>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tabel">📋 Tabel</button>
+        <button class="tab-btn" data-tab="utang">💸 Kelola Utang</button>
+      </div>
+
+      <div id="tab-tabel" class="tab-content active">
+        <input type="text" id="search-box" placeholder="Cari item...">
+        <div class="table-wrap">
+          <table id="data-table"><thead>
+            <tr><th>Tanggal</th><th>Item</th><th>Kategori</th><th>Nominal</th><th>Tipe</th><th>Status</th></tr>
+          </thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <div id="tab-utang" class="tab-content">
+        <p class="hint">Ubah status jadi "Lunas" dan pilih metode pembayaran, lalu klik simpan.</p>
+        <div id="utang-list"></div>
+      </div>
     </section>
   </main>
 </div>
