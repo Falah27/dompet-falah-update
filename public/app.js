@@ -1,4 +1,4 @@
-const API_KEY = 'buat-string-acak-panjang-sendiri-disini'; // sama dengan API_SECRET
+const API_KEY = 'bento-rahasia-punya-falah-2026-xyz789'; // sama dengan API_SECRET
 const KATEGORI_PEMASUKAN = ["Gaji","Bonus","Hadiah","Pembayaran","Penjualan","Transfer Internal","Lainnya"];
 const KATEGORI_PENGELUARAN = ["Makan","Jajan","Belanja","Hiburan","Transport","Kesehatan","Tagihan","Amal","Saving","Transfer Internal","Lainnya"];
 const METODE = ["Cash","Livin (Mandiri)","Octo (CIMB)","DANA","Shopeepay","Kartu Kredit"];
@@ -15,12 +15,26 @@ async function apiCall(url, opts = {}) {
 }
 
 async function loadData() {
-  const data = await apiCall('/api/data');
-  state = data;
-  renderDashboard();
-  renderWallets();
-  renderTable(state.transaksi);
-  fillTransferSelects();
+  try {
+    const data = await apiCall('/api/data');
+    if (data.error) {
+      alert('Gagal memuat data: ' + data.error);
+      console.error('API error:', data.error);
+      return;
+    }
+    state = {
+      transaksi: data.transaksi || [],
+      dompet: data.dompet || [],
+      target: data.target || [],
+    };
+    renderDashboard();
+    renderWallets();
+    renderTable(state.transaksi);
+    fillTransferSelects();
+  } catch (e) {
+    alert('Gagal terhubung ke server: ' + e.message);
+    console.error(e);
+  }
 }
 
 function renderDashboard() {
